@@ -580,8 +580,6 @@ When loading a motor from an .ork file, OpenRocket uses the following precedence
    local motor database. If found, the database version is used (it may have more accurate or updated data).
 2. **Embedded .rse file** — if the motor is not in the database, OpenRocket looks for a
    ``thrustcurves/<digest>.rse`` entry in the .ork zip archive and parses it.
-3. **Inline XML fallback** — for backward compatibility with pre-release files, inline ``<thrustcurvepoint>``
-   elements inside the ``<motor>`` XML are still accepted as a last resort.
 
 This precedence is implemented in ``MotorHandler.getMotor()``
 (see :file:`core/src/main/java/.../file/openrocket/importt/MotorHandler.java`).
