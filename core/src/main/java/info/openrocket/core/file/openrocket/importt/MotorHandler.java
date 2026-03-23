@@ -1,16 +1,19 @@
 package info.openrocket.core.file.openrocket.importt;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.List;
+import java.util.Locale;
 
-import info.openrocket.core.logging.Warning;
-import info.openrocket.core.logging.WarningSet;
+import info.openrocket.core.document.Attachment;
 import info.openrocket.core.file.DocumentLoadingContext;
+import info.openrocket.core.file.motor.GeneralMotorLoader;
 import info.openrocket.core.file.simplesax.AbstractElementHandler;
 import info.openrocket.core.file.simplesax.ElementHandler;
 import info.openrocket.core.file.simplesax.PlainTextHandler;
+import info.openrocket.core.logging.Warning;
+import info.openrocket.core.logging.WarningSet;
 import info.openrocket.core.motor.Manufacturer;
 import info.openrocket.core.motor.Motor;
 import info.openrocket.core.motor.MotorDigest;
@@ -55,7 +58,8 @@ class MotorHandler extends AbstractElementHandler {
 	 * Preference order:
 	 * <ol>
 	 *   <li>Lookup via {@link DocumentLoadingContext#getMotorFinder()} (typically the motor database).</li>
-	 *   <li>Embedded thrust curve data (one or more {@code <thrustcurvepoint>} elements), if present.</li>
+	 *   <li>Embedded .rse file in the {@code thrustcurves/} directory of the .ork zip archive.</li>
+	 *   <li>Inline thrust curve data ({@code <thrustcurvepoint>} elements) for backward compatibility.</li>
 	 * </ol>
 	 *
 	 * @param warnings warnings sink
@@ -63,7 +67,6 @@ class MotorHandler extends AbstractElementHandler {
 	 */
 	public Motor getMotor(WarningSet warnings) {
 		// First try to locate an equivalent motor in the motor database.
-		// If that fails, fall back to the embedded thrust curve data (if present).
 		WarningSet databaseWarnings = new WarningSet();
 		Motor databaseMotor = context.getMotorFinder().findMotor(type, manufacturer, designation, Double.NaN, Double.NaN, digest,
 				databaseWarnings);
@@ -72,16 +75,46 @@ class MotorHandler extends AbstractElementHandler {
 			return databaseMotor;
 		}
 
+		// Try loading from embedded .rse file in the zip archive.
+		if (digest != null && !digest.isEmpty()) {
+			Motor zipMotor = loadMotorFromZip(digest);
+			if (zipMotor != null) {
+				return zipMotor;
+			}
+		}
+
+		// Fall back to inline <thrustcurvepoint> elements (backward compat with pre-release 1.11 files).
 		if (!thrustCurveTime.isEmpty()) {
 			Motor embedded = buildEmbeddedThrustCurveMotor(warnings);
 			if (embedded != null) {
-				// Deliberately discard databaseWarnings here: the motor isn't missing since we loaded it from the file.
 				return embedded;
 			}
 		}
 
 		// Nothing worked: surface any database lookup warnings (e.g. missing motor).
 		warnings.addAll(databaseWarnings);
+		return null;
+	}
+
+	/**
+	 * Attempt to load a motor from a {@code thrustcurves/<digest>.rse} entry in the .ork zip archive.
+	 *
+	 * @param motorDigest the motor digest used as the filename
+	 * @return the loaded motor, or {@code null} if not found or not parseable
+	 */
+	private Motor loadMotorFromZip(String motorDigest) {
+		try {
+			Attachment attachment = context.getAttachmentFactory().getAttachment("thrustcurves/" + motorDigest + ".rse");
+			try (InputStream is = attachment.getBytes()) {
+				GeneralMotorLoader loader = new GeneralMotorLoader();
+				List<ThrustCurveMotor.Builder> motors = loader.load(is, motorDigest + ".rse");
+				if (!motors.isEmpty()) {
+					return motors.get(0).build();
+				}
+			}
+		} catch (Exception e) {
+			// Entry not found or parse error — fall through to next strategy.
+		}
 		return null;
 	}
 
