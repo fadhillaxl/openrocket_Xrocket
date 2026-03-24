@@ -25,8 +25,8 @@
 #
 files: [
   {
-    "source": "core/src/main/resources/l10n/messages.properties",
-    "translation": "core/src/main/resources/l10n/messages_%two_letters_code%.properties",
+    "source": "/core/src/main/resources/l10n/messages.properties",
+    "translation": "/core/src/main/resources/l10n/messages_%two_letters_code%.properties",
 
     "type": "properties",
 
@@ -37,8 +37,8 @@ files: [
     "escape_special_characters": 0
   },
   {
-    "source": "core/src/main/resources/l10n/messages.properties",
-    "translation": "core/src/main/resources/l10n/messages_%locale_with_underscore%.properties",
+    "source": "/core/src/main/resources/l10n/messages.properties",
+    "translation": "/core/src/main/resources/l10n/messages_%locale_with_underscore%.properties",
 
     "type": "properties",
 
