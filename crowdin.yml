@@ -13,6 +13,14 @@
 "preserve_hierarchy": false
 
 #
+# PR configuration
+#
+"pull_request_title": "Sync translations from Crowdin",
+"pull_request_labels": [
+  "translation",
+]
+
+#
 # Files configuration
 #
 files: [
