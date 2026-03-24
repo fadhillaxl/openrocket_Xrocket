@@ -15,9 +15,9 @@
 #
 # PR configuration
 #
-"pull_request_title": "Sync translations from Crowdin",
+"pull_request_title": "Sync translations from Crowdin"
 "pull_request_labels": [
-  "translation",
+  "translation"
 ]
 
 #
