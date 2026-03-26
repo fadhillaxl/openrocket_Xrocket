@@ -527,8 +527,10 @@ public class CaliperManager {
 			}
 			
 			if (draggingCaliperLine == caliper1Line) {
+				caliper1Line.setDragPositionLabel(unitSelector.getSelectedUnit().toStringUnit(newX));
 				setCaliperLinePosition(true, newX);
 			} else if (draggingCaliperLine == caliper2Line) {
+				caliper2Line.setDragPositionLabel(unitSelector.getSelectedUnit().toStringUnit(newX));
 				setCaliperLinePosition(false, newX);
 			}
 			return true;
@@ -582,8 +584,10 @@ public class CaliperManager {
 			}
 			
 			if (draggingHorizontalCaliperLine == caliper1HorizontalLine) {
+				caliper1HorizontalLine.setDragPositionLabel(unitSelector.getSelectedUnit().toStringUnit(newY));
 				setHorizontalCaliperLinePosition(true, newY);
 			} else if (draggingHorizontalCaliperLine == caliper2HorizontalLine) {
+				caliper2HorizontalLine.setDragPositionLabel(unitSelector.getSelectedUnit().toStringUnit(newY));
 				setHorizontalCaliperLinePosition(false, newY);
 			}
 			return true;
@@ -604,6 +608,10 @@ public class CaliperManager {
 		boolean wasDragging = isDragging();
 		draggingCaliperLine = null;
 		draggingHorizontalCaliperLine = null;
+		caliper1Line.setDragPositionLabel(null);
+		caliper2Line.setDragPositionLabel(null);
+		caliper1HorizontalLine.setDragPositionLabel(null);
+		caliper2HorizontalLine.setDragPositionLabel(null);
 		// Clear shift-drag snapped target when dragging stops
 		if (shiftDragSnappedTarget != null) {
 			shiftDragSnappedTarget = null;

@@ -15,6 +15,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 
 /**
  * A horizontal line element for the caliper measurement tool.
@@ -56,6 +57,7 @@ public class HorizontalCaliperLine implements FigureElement {
 	private boolean isSnapMode = false;  // Whether we're in snap mode (affects transparency)
 	private String handleLabel = "";
 	private HorizontalCaliperLine siblingLine = null;  // The other caliper line, used to avoid indicator overlap
+	private String dragPositionLabel = null; // Non-null while dragging; shown as a tooltip below the handle
 
 	private static Color lineColor;
 	private static Color handleColor;
@@ -193,6 +195,10 @@ public class HorizontalCaliperLine implements FigureElement {
 		this.siblingLine = sibling;
 	}
 
+	public void setDragPositionLabel(String label) {
+		this.dragPositionLabel = label;
+	}
+
 	@Override
 	public void paint(Graphics2D g2, double scale) {
 		paint(g2, scale, null);
@@ -286,6 +292,11 @@ public class HorizontalCaliperLine implements FigureElement {
 				g2Screen.drawString(handleLabel, (float) textX, (float) textY);
 			}
 			
+			// Draw drag position tooltip below the handle
+			if (dragPositionLabel != null) {
+				drawDragTooltip(g2Screen, handleX_screen + DIAMOND_HALF_WIDTH, handleY_screen + DIAMOND_HALF_HEIGHT);
+			}
+
 			// Draw out-of-view indicator if the caliper line is outside the visible area
 			if (screenVisible != null) {
 				// Both handleY_screen and screenVisible are now in screen coordinates (after transform reset)
@@ -395,6 +406,36 @@ public class HorizontalCaliperLine implements FigureElement {
 	 * @param visible the visible viewport rectangle
 	 * @return the bounds of the indicator, or null if not out of view
 	 */
+	/**
+	 * Draw a small tooltip below the handle showing the current drag position.
+	 *
+	 * @param g2    graphics context in screen coordinates
+	 * @param cx    horizontal center of the handle diamond
+	 * @param topY  Y coordinate of the handle's bottom tip
+	 */
+	private void drawDragTooltip(Graphics2D g2, double cx, double topY) {
+		Font font = HANDLE_LABEL_FONT.deriveFont(Font.PLAIN, HANDLE_LABEL_FONT.getSize2D() * 1.5f);
+		g2.setFont(font);
+		FontRenderContext frc = g2.getFontRenderContext();
+		Rectangle2D textBounds = font.getStringBounds(dragPositionLabel, frc);
+		double tw = textBounds.getWidth();
+		double th = textBounds.getHeight();
+		double pad = 4.0;
+		double boxW = tw + pad * 2;
+		double boxH = th + pad;
+		double boxX = cx - boxW / 2.0;
+		double boxY = topY + 5.0;
+
+		g2.setColor(handleColor);
+		g2.fill(new RoundRectangle2D.Double(boxX, boxY, boxW, boxH, 6, 6));
+		g2.setStroke(new BasicStroke(1.0f));
+		g2.setColor(new Color(handleBorderColor.getRed(), handleBorderColor.getGreen(),
+				handleBorderColor.getBlue(), 120));
+		g2.draw(new RoundRectangle2D.Double(boxX, boxY, boxW, boxH, 6, 6));
+		g2.setColor(handleTextColor);
+		g2.drawString(dragPositionLabel, (float) (boxX + pad), (float) (boxY + th * 0.8));
+	}
+
 	/**
 	 * Compute the horizontal center position for the out-of-view indicator.
 	 * When both calipers are off the same edge, caliper "1" sits at 1/3 width
