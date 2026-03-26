@@ -55,6 +55,7 @@ public class CaliperLine implements FigureElement {
 	private boolean isIndicatorHovered = false; // Whether the mouse is hovering over the out-of-view indicator
 	private boolean isSnapMode = false;  // Whether we're in snap mode (affects transparency)
 	private String handleLabel = "";
+	private CaliperLine siblingLine = null;  // The other caliper line, used to avoid indicator overlap
 
 	private static Color lineColor;
 	private static Color handleColor;
@@ -191,6 +192,10 @@ public class CaliperLine implements FigureElement {
 		this.handleLabel = label != null ? label : "";
 	}
 
+	public void setSiblingLine(CaliperLine sibling) {
+		this.siblingLine = sibling;
+	}
+
 	@Override
 	public void paint(Graphics2D g2, double scale) {
 		paint(g2, scale, null);
@@ -212,6 +217,7 @@ public class CaliperLine implements FigureElement {
 			}
 
 			double handleX_screen = screenPoint.x;
+			double siblingXScreen = siblingLine != null ? siblingLine.getScreenX(transform) : Double.NaN;
 			double handleY_screen = 0.0;  // Start at the very top
 
 			// Reset transform to draw in screen coordinates
@@ -288,7 +294,7 @@ public class CaliperLine implements FigureElement {
 				boolean isOutOfView = (handleX_screen < screenVisible.x - margin) || 
 				                       (handleX_screen > screenVisible.x + screenVisible.width + margin);
 				if (isOutOfView) {
-					drawOutOfViewIndicator(g2Screen, handleX_screen, screenVisible);
+					drawOutOfViewIndicator(g2Screen, handleX_screen, screenVisible, siblingXScreen);
 				}
 			}
 		} finally {
@@ -387,22 +393,38 @@ public class CaliperLine implements FigureElement {
 	 * @param visible the visible viewport rectangle
 	 * @return the bounds of the indicator, or null if not out of view
 	 */
-	public Rectangle2D.Double getIndicatorBounds(double caliperXScreen, Rectangle visible) {
+	/**
+	 * Compute the vertical center position for the out-of-view indicator.
+	 * When both calipers are off the same edge, caliper "1" sits at 1/3 height
+	 * and caliper "2" at 2/3 height so they don't overlap.
+	 */
+	private double computeIndicatorY(boolean isLeft, Rectangle visible, double siblingXScreen) {
+		double margin = 5.0;
+		boolean siblingOnSameSide = Double.isFinite(siblingXScreen) && (
+				(isLeft && siblingXScreen < visible.x - margin) ||
+				(!isLeft && siblingXScreen > visible.x + visible.width + margin));
+		if (siblingOnSameSide) {
+			return visible.y + visible.height * ("1".equals(handleLabel) ? 1.0 / 3.0 : 2.0 / 3.0);
+		}
+		return visible.y + visible.height / 2.0;
+	}
+
+	public Rectangle2D.Double getIndicatorBounds(double caliperXScreen, Rectangle visible, double siblingXScreen) {
 		if (visible == null) {
 			return null;
 		}
-		
+
 		double margin = 5.0;
-		boolean isOutOfView = (caliperXScreen < visible.x - margin) || 
+		boolean isOutOfView = (caliperXScreen < visible.x - margin) ||
 		                       (caliperXScreen > visible.x + visible.width + margin);
 		if (!isOutOfView) {
 			return null;
 		}
-		
+
 		// Determine which edge to draw the arrow on
 		boolean isLeft = caliperXScreen < visible.x;
 		double arrowX = isLeft ? visible.x : visible.x + visible.width;
-		double arrowY = visible.y + visible.height / 2.0;
+		double arrowY = computeIndicatorY(isLeft, visible, siblingXScreen);
 		
 		// Calculate bounds: arrow area + label area
 		double minX, maxX, minY, maxY;
@@ -439,7 +461,7 @@ public class CaliperLine implements FigureElement {
 	 * @param caliperX the X position of the caliper line in screen coordinates
 	 * @param visible the visible viewport rectangle
 	 */
-	private void drawOutOfViewIndicator(Graphics2D g2Screen, double caliperX, Rectangle visible) {
+	private void drawOutOfViewIndicator(Graphics2D g2Screen, double caliperX, Rectangle visible, double siblingXScreen) {
 		Color baseColor = isIndicatorHovered ? ColorConversion.brightenColor(lineColor, 60) : lineColor;
 		Color indicatorColor = isSnapMode
 				? new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), 128)
@@ -451,8 +473,8 @@ public class CaliperLine implements FigureElement {
 		boolean isLeft = caliperX < visible.x;
 		double arrowX = isLeft ? visible.x : visible.x + visible.width;
 
-		// Position arrow vertically centered in the visible area
-		double arrowY = visible.y + visible.height / 2.0;
+		// Position arrow vertically — offset from center when both calipers are on the same edge
+		double arrowY = computeIndicatorY(isLeft, visible, siblingXScreen);
 
 		// Draw arrow pointing toward the caliper line
 		Path2D.Double arrow = new Path2D.Double();
@@ -471,34 +493,32 @@ public class CaliperLine implements FigureElement {
 		g2Screen.fill(arrow);
 		g2Screen.draw(arrow);
 
-		// Draw caliper number label and "click" hint below the arrow
+		// Draw caliper number label and "click" hint next to the arrow
 		FontRenderContext frc = g2Screen.getFontRenderContext();
-		double labelX, labelY;
+		double labelX = 0, labelY = arrowY;
 		if (handleLabel != null && !handleLabel.isEmpty()) {
 			g2Screen.setFont(INDICATOR_LABEL_FONT);
 			Rectangle2D textBounds = INDICATOR_LABEL_FONT.getStringBounds(handleLabel, frc);
 			double textWidth = textBounds.getWidth();
 			double textHeight = textBounds.getHeight();
-			if (isLeft) {
-				labelX = arrowX + ARROW_SIZE + LABEL_OFFSET;
-			} else {
-				labelX = arrowX - ARROW_SIZE - LABEL_OFFSET - textWidth;
-			}
+			labelX = isLeft
+					? arrowX + ARROW_SIZE + LABEL_OFFSET
+					: arrowX - ARROW_SIZE - LABEL_OFFSET - textWidth;
 			labelY = arrowY + textHeight / 4.0;
 			g2Screen.setColor(indicatorColor);
 			g2Screen.drawString(handleLabel, (float) labelX, (float) labelY);
 		}
 
-		// Always draw a small "click to return" hint below the arrow
+		// "click" hint: aligned with the number label so it stays within the viewport
 		Font hintFont = INDICATOR_LABEL_FONT.deriveFont(Font.PLAIN, INDICATOR_LABEL_FONT.getSize2D());
 		g2Screen.setFont(hintFont);
 		String hint = "click";
 		Rectangle2D hintBounds = hintFont.getStringBounds(hint, frc);
 		double hintWidth = hintBounds.getWidth();
 		double hintX = isLeft
-				? arrowX + (ARROW_SIZE - hintWidth) / 2.0
-				: arrowX - ARROW_SIZE + (ARROW_SIZE - hintWidth) / 2.0;
-		double hintY = arrowY + ARROW_SIZE / 2.0 + hintBounds.getHeight();
+				? arrowX + ARROW_SIZE + LABEL_OFFSET
+				: arrowX - ARROW_SIZE - LABEL_OFFSET - hintWidth;
+		double hintY = labelY + hintBounds.getHeight();
 		Color hintColor = new Color(indicatorColor.getRed(), indicatorColor.getGreen(),
 				indicatorColor.getBlue(), isSnapMode ? 100 : 180);
 		g2Screen.setColor(hintColor);

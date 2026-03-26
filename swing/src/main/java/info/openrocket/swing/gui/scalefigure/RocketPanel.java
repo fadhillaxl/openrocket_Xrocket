@@ -997,7 +997,8 @@ public class RocketPanel extends JPanel implements TreeSelectionListener, Change
 
 					if (cal1Line != null) {
 						double screenX = cal1Line.getScreenX(transform);
-						java.awt.geom.Rectangle2D.Double bounds = cal1Line.getIndicatorBounds(screenX, visibleRect);
+						double siblingX = cal2Line != null ? cal2Line.getScreenX(transform) : Double.NaN;
+						java.awt.geom.Rectangle2D.Double bounds = cal1Line.getIndicatorBounds(screenX, visibleRect, siblingX);
 						if (bounds != null && bounds.contains(clickPoint.x, clickPoint.y)) {
 							caliperManager.moveCaliperLineIntoView(true, visibleRect, screenToModelFunc);
 							return; // Handled, don't process component click
@@ -1006,7 +1007,8 @@ public class RocketPanel extends JPanel implements TreeSelectionListener, Change
 
 					if (cal2Line != null) {
 						double screenX = cal2Line.getScreenX(transform);
-						java.awt.geom.Rectangle2D.Double bounds = cal2Line.getIndicatorBounds(screenX, visibleRect);
+						double siblingX = cal1Line != null ? cal1Line.getScreenX(transform) : Double.NaN;
+						java.awt.geom.Rectangle2D.Double bounds = cal2Line.getIndicatorBounds(screenX, visibleRect, siblingX);
 						if (bounds != null && bounds.contains(clickPoint.x, clickPoint.y)) {
 							caliperManager.moveCaliperLineIntoView(false, visibleRect, screenToModelFunc);
 							return; // Handled, don't process component click
@@ -1019,7 +1021,8 @@ public class RocketPanel extends JPanel implements TreeSelectionListener, Change
 
 					if (cal1Line != null) {
 						double screenY = cal1Line.getScreenY(transform);
-						java.awt.geom.Rectangle2D.Double bounds = cal1Line.getIndicatorBounds(screenY, visibleRect);
+						double siblingY = cal2Line != null ? cal2Line.getScreenY(transform) : Double.NaN;
+						java.awt.geom.Rectangle2D.Double bounds = cal1Line.getIndicatorBounds(screenY, visibleRect, siblingY);
 						if (bounds != null && bounds.contains(clickPoint.x, clickPoint.y)) {
 							caliperManager.moveCaliperLineIntoView(true, visibleRect, screenToModelFunc);
 							return; // Handled, don't process component click
@@ -1028,7 +1031,8 @@ public class RocketPanel extends JPanel implements TreeSelectionListener, Change
 
 					if (cal2Line != null) {
 						double screenY = cal2Line.getScreenY(transform);
-						java.awt.geom.Rectangle2D.Double bounds = cal2Line.getIndicatorBounds(screenY, visibleRect);
+						double siblingY = cal1Line != null ? cal1Line.getScreenY(transform) : Double.NaN;
+						java.awt.geom.Rectangle2D.Double bounds = cal2Line.getIndicatorBounds(screenY, visibleRect, siblingY);
 						if (bounds != null && bounds.contains(clickPoint.x, clickPoint.y)) {
 							caliperManager.moveCaliperLineIntoView(false, visibleRect, screenToModelFunc);
 							return; // Handled, don't process component click

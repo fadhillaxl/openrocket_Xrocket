@@ -55,6 +55,7 @@ public class HorizontalCaliperLine implements FigureElement {
 	private boolean isIndicatorHovered = false; // Whether the mouse is hovering over the out-of-view indicator
 	private boolean isSnapMode = false;  // Whether we're in snap mode (affects transparency)
 	private String handleLabel = "";
+	private HorizontalCaliperLine siblingLine = null;  // The other caliper line, used to avoid indicator overlap
 
 	private static Color lineColor;
 	private static Color handleColor;
@@ -188,6 +189,10 @@ public class HorizontalCaliperLine implements FigureElement {
 		this.handleLabel = label != null ? label : "";
 	}
 
+	public void setSiblingLine(HorizontalCaliperLine sibling) {
+		this.siblingLine = sibling;
+	}
+
 	@Override
 	public void paint(Graphics2D g2, double scale) {
 		paint(g2, scale, null);
@@ -207,6 +212,8 @@ public class HorizontalCaliperLine implements FigureElement {
 			if (Double.isNaN(screenPoint.y) || Double.isInfinite(screenPoint.y)) {
 				return;
 			}
+
+			double siblingYScreen = siblingLine != null ? siblingLine.getScreenY(transform) : Double.NaN;
 
 			// Reset transform to draw in screen coordinates
 			g2Screen.setTransform(new AffineTransform());
@@ -287,7 +294,7 @@ public class HorizontalCaliperLine implements FigureElement {
 				boolean isOutOfView = (handleY_screen < screenVisible.y - margin) || 
 				                      (handleY_screen > screenVisible.y + screenVisible.height + margin);
 				if (isOutOfView) {
-					drawOutOfViewIndicator(g2Screen, handleY_screen, screenVisible);
+					drawOutOfViewIndicator(g2Screen, handleY_screen, screenVisible, siblingYScreen);
 				}
 			}
 		} finally {
@@ -388,22 +395,38 @@ public class HorizontalCaliperLine implements FigureElement {
 	 * @param visible the visible viewport rectangle
 	 * @return the bounds of the indicator, or null if not out of view
 	 */
-	public Rectangle2D.Double getIndicatorBounds(double caliperYScreen, Rectangle visible) {
+	/**
+	 * Compute the horizontal center position for the out-of-view indicator.
+	 * When both calipers are off the same edge, caliper "1" sits at 1/3 width
+	 * and caliper "2" at 2/3 width so they don't overlap.
+	 */
+	private double computeIndicatorX(boolean isTop, Rectangle visible, double siblingYScreen) {
+		double margin = 5.0;
+		boolean siblingOnSameSide = Double.isFinite(siblingYScreen) && (
+				(isTop && siblingYScreen < visible.y - margin) ||
+				(!isTop && siblingYScreen > visible.y + visible.height + margin));
+		if (siblingOnSameSide) {
+			return visible.x + visible.width * ("1".equals(handleLabel) ? 1.0 / 3.0 : 2.0 / 3.0);
+		}
+		return visible.x + visible.width / 2.0;
+	}
+
+	public Rectangle2D.Double getIndicatorBounds(double caliperYScreen, Rectangle visible, double siblingYScreen) {
 		if (visible == null) {
 			return null;
 		}
-		
+
 		double margin = 5.0;
-		boolean isOutOfView = (caliperYScreen < visible.y - margin) || 
+		boolean isOutOfView = (caliperYScreen < visible.y - margin) ||
 		                      (caliperYScreen > visible.y + visible.height + margin);
 		if (!isOutOfView) {
 			return null;
 		}
-		
+
 		// Determine which edge to draw the arrow on
 		boolean isTop = caliperYScreen < visible.y;
 		double arrowY = isTop ? visible.y : visible.y + visible.height;
-		double arrowX = visible.x + visible.width / 2.0;
+		double arrowX = computeIndicatorX(isTop, visible, siblingYScreen);
 		
 		// Calculate bounds: arrow area + label area
 		double minX, maxX, minY, maxY;
@@ -441,7 +464,7 @@ public class HorizontalCaliperLine implements FigureElement {
 	 * @param caliperY the Y position of the caliper line in screen coordinates
 	 * @param visible the visible viewport rectangle
 	 */
-	private void drawOutOfViewIndicator(Graphics2D g2Screen, double caliperY, Rectangle visible) {
+	private void drawOutOfViewIndicator(Graphics2D g2Screen, double caliperY, Rectangle visible, double siblingYScreen) {
 		Color baseColor = isIndicatorHovered ? ColorConversion.brightenColor(lineColor, 60) : lineColor;
 		Color indicatorColor = isSnapMode
 				? new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), 128)
@@ -453,8 +476,8 @@ public class HorizontalCaliperLine implements FigureElement {
 		boolean isTop = caliperY < visible.y;
 		double arrowY = isTop ? visible.y : visible.y + visible.height;
 
-		// Position arrow horizontally centered in the visible area
-		double arrowX = visible.x + visible.width / 2.0;
+		// Position arrow horizontally — offset from center when both calipers are on the same edge
+		double arrowX = computeIndicatorX(isTop, visible, siblingYScreen);
 
 		// Draw arrow pointing toward the caliper line
 		Path2D.Double arrow = new Path2D.Double();

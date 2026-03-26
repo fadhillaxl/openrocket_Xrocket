@@ -187,10 +187,14 @@ public class CaliperManager {
 		caliper1Line.setHandleLabel("1");
 		caliper2Line = new CaliperLine(0.0);
 		caliper2Line.setHandleLabel("2");
+		caliper1Line.setSiblingLine(caliper2Line);
+		caliper2Line.setSiblingLine(caliper1Line);
 		caliper1HorizontalLine = new HorizontalCaliperLine(0.0);
 		caliper1HorizontalLine.setHandleLabel("1");
 		caliper2HorizontalLine = new HorizontalCaliperLine(0.0);
 		caliper2HorizontalLine.setHandleLabel("2");
+		caliper1HorizontalLine.setSiblingLine(caliper2HorizontalLine);
+		caliper2HorizontalLine.setSiblingLine(caliper1HorizontalLine);
 
 		// Create UI components
 		createUIComponents();
@@ -653,9 +657,9 @@ public class CaliperManager {
 			boolean nearCal2 = transform != null && isHandleOrLineHit(caliper2Line, screenPoint, transform, visibleRect);
 
 			boolean ind1Hovered = transform != null && visibleRect != null
-					&& isIndicatorHit(caliper1Line.getIndicatorBounds(caliper1Line.getScreenX(transform), visibleRect), screenPoint);
+					&& isIndicatorHit(caliper1Line.getIndicatorBounds(caliper1Line.getScreenX(transform), visibleRect, caliper2Line.getScreenX(transform)), screenPoint);
 			boolean ind2Hovered = transform != null && visibleRect != null
-					&& isIndicatorHit(caliper2Line.getIndicatorBounds(caliper2Line.getScreenX(transform), visibleRect), screenPoint);
+					&& isIndicatorHit(caliper2Line.getIndicatorBounds(caliper2Line.getScreenX(transform), visibleRect, caliper1Line.getScreenX(transform)), screenPoint);
 
 			boolean cal1WasHovered = caliper1Line.isHovered();
 			boolean cal2WasHovered = caliper2Line.isHovered();
@@ -676,9 +680,9 @@ public class CaliperManager {
 					&& isHandleOrLineHit(caliper2HorizontalLine, screenPoint, transform, visibleRect);
 
 			boolean ind1Hovered = transform != null && visibleRect != null
-					&& isIndicatorHit(caliper1HorizontalLine.getIndicatorBounds(caliper1HorizontalLine.getScreenY(transform), visibleRect), screenPoint);
+					&& isIndicatorHit(caliper1HorizontalLine.getIndicatorBounds(caliper1HorizontalLine.getScreenY(transform), visibleRect, caliper2HorizontalLine.getScreenY(transform)), screenPoint);
 			boolean ind2Hovered = transform != null && visibleRect != null
-					&& isIndicatorHit(caliper2HorizontalLine.getIndicatorBounds(caliper2HorizontalLine.getScreenY(transform), visibleRect), screenPoint);
+					&& isIndicatorHit(caliper2HorizontalLine.getIndicatorBounds(caliper2HorizontalLine.getScreenY(transform), visibleRect, caliper1HorizontalLine.getScreenY(transform)), screenPoint);
 
 			boolean cal1WasHovered = caliper1HorizontalLine.isHovered();
 			boolean cal2WasHovered = caliper2HorizontalLine.isHovered();
@@ -733,20 +737,20 @@ public class CaliperManager {
 
 		if (mode == CaliperMode.VERTICAL) {
 			if (caliper1Line != null) {
-				java.awt.geom.Rectangle2D.Double b = caliper1Line.getIndicatorBounds(caliper1Line.getScreenX(transform), visibleRect);
+				java.awt.geom.Rectangle2D.Double b = caliper1Line.getIndicatorBounds(caliper1Line.getScreenX(transform), visibleRect, caliper2Line.getScreenX(transform));
 				if (isIndicatorHit(b, p)) return true;
 			}
 			if (caliper2Line != null) {
-				java.awt.geom.Rectangle2D.Double b = caliper2Line.getIndicatorBounds(caliper2Line.getScreenX(transform), visibleRect);
+				java.awt.geom.Rectangle2D.Double b = caliper2Line.getIndicatorBounds(caliper2Line.getScreenX(transform), visibleRect, caliper1Line.getScreenX(transform));
 				if (isIndicatorHit(b, p)) return true;
 			}
 		} else {
 			if (caliper1HorizontalLine != null) {
-				java.awt.geom.Rectangle2D.Double b = caliper1HorizontalLine.getIndicatorBounds(caliper1HorizontalLine.getScreenY(transform), visibleRect);
+				java.awt.geom.Rectangle2D.Double b = caliper1HorizontalLine.getIndicatorBounds(caliper1HorizontalLine.getScreenY(transform), visibleRect, caliper2HorizontalLine.getScreenY(transform));
 				if (isIndicatorHit(b, p)) return true;
 			}
 			if (caliper2HorizontalLine != null) {
-				java.awt.geom.Rectangle2D.Double b = caliper2HorizontalLine.getIndicatorBounds(caliper2HorizontalLine.getScreenY(transform), visibleRect);
+				java.awt.geom.Rectangle2D.Double b = caliper2HorizontalLine.getIndicatorBounds(caliper2HorizontalLine.getScreenY(transform), visibleRect, caliper1HorizontalLine.getScreenY(transform));
 				if (isIndicatorHit(b, p)) return true;
 			}
 		}
