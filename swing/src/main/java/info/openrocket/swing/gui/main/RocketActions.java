@@ -107,6 +107,7 @@ public class RocketActions {
 	private final RocketAction exportOBJAction;
 	private final RocketAction exportSVGAction;
 	private final RocketAction toggleVisibilityAction;
+	private final RocketAction toggleVisibilityContextMenuAction;
 	private final RocketAction showAllComponentsAction;
 	private final RocketAction toggleActiveAction;
 	private static final Translator trans = Application.getTranslator();
@@ -136,6 +137,7 @@ public class RocketActions {
 		this.exportOBJAction = new ExportOBJAction();
 		this.exportSVGAction = new ExportSVGAction();
 		this.toggleVisibilityAction = new ToggleVisibilityAction();
+		this.toggleVisibilityContextMenuAction = new ContextMenuToggleVisibilityAction();
 		this.showAllComponentsAction = new ShowAllComponentsAction();
 		this.toggleActiveAction = new ToggleActiveAction();
 
@@ -188,6 +190,7 @@ public class RocketActions {
 		exportOBJAction.clipboardChanged();
 		exportSVGAction.clipboardChanged();
 		toggleVisibilityAction.clipboardChanged();
+		toggleVisibilityContextMenuAction.clipboardChanged();
 		showAllComponentsAction.clipboardChanged();
 		toggleActiveAction.clipboardChanged();
 	}
@@ -249,6 +252,10 @@ public class RocketActions {
 
 	public Action getToggleVisibilityAction() {
 		return toggleVisibilityAction;
+	}
+
+	public Action getToggleVisibilityContextMenuAction() {
+		return toggleVisibilityContextMenuAction;
 	}
 
 	public Action getShowAllComponentsAction() {
@@ -1469,6 +1476,25 @@ public class RocketActions {
 			var rocketSelected = components.stream().anyMatch(Rocket.class::isInstance);
 			var allComponentsSelected = getDescendants(rocket).size() == components.size();
 			return rocketSelected || allComponentsSelected;
+		}
+	}
+
+	/**
+	 * Variant of ToggleVisibilityAction for use in the component tree context menu.
+	 * Uses short "Hide"/"Show" labels instead of "Hide selected"/"Show selected".
+	 */
+	private class ContextMenuToggleVisibilityAction extends ToggleVisibilityAction {
+		@Override
+		public void clipboardChanged() {
+			super.clipboardChanged();
+			var components = new ArrayList<>(selectionModel.getSelectedComponents());
+			if (components.isEmpty()) {
+				return;
+			}
+			boolean anyVisible = components.stream().anyMatch(RocketComponent::isVisible);
+			putValue(NAME, anyVisible
+					? trans.get("RocketActions.VisibilityAct.Hide")
+					: trans.get("RocketActions.VisibilityAct.Show"));
 		}
 	}
 

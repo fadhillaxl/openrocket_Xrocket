@@ -286,7 +286,7 @@ private static final Translator trans = Application.getTranslator();
 
 			popupMenu.addSeparator();
 			popupMenu.add(actions.getScaleAction());
-			popupMenu.add(actions.getToggleVisibilityAction());
+			popupMenu.add(actions.getToggleVisibilityContextMenuAction());
 			JMenuItem toggleStageActiveItem = popupMenu.add(actions.getToggleActiveAction());
 
 			popupMenu.addSeparator();
