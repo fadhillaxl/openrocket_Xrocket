@@ -463,6 +463,13 @@ public class Icons {
 			"pix/icons/lucide/ban.svg",
 			"pix/icons/component-disabled_light.png",
 			"Component Disabled");
+	public static final Icon COMPONENT_ENABLED = loadSvgIcon(
+			"pix/icons/lucide/circle-check.svg",
+			"Component Enabled",
+			Map.of(
+					SVG_THEME_COLOR_RGB, SVG_DEFAULT_COLOR_KEY,
+					0x499C54, "OR.colors.green"
+			));
 
 	public static final Icon LOCKED = loadIcon(
 			"pix/icons/lucide/lock.svg",
