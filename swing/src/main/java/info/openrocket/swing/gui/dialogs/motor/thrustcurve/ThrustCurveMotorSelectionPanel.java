@@ -472,16 +472,16 @@ public class ThrustCurveMotorSelectionPanel extends JPanel implements MotorSelec
 		
 		// If current motor is not found in db, add a new ThrustCurveMotorSet containing it
 		if (motorToSelect != null) {
-			ThrustCurveMotorSet motorSetToSelect = null;
-			motorSetToSelect = findMotorSet(motorToSelect);
+			ThrustCurveMotorSet motorSetToSelect = findMotorSet(motorToSelect);
 			if (motorSetToSelect == null) {
 				database = new ArrayList<>(database);
 				ThrustCurveMotorSet extra = new ThrustCurveMotorSet();
 				extra.addMotor(motorToSelect);
 				database.add(extra);
 				Collections.sort(database);
+				model.setDatabase(database);
 			}
-			
+
 			select(motorToSelect);
 
 		}
@@ -657,7 +657,15 @@ public class ThrustCurveMotorSelectionPanel extends JPanel implements MotorSelec
 
 	private void scrollSelectionVisible() {
 		if (selectedMotorSet != null) {
-			int index = table.convertRowIndexToView(model.getIndex(selectedMotorSet));
+			int modelIndex = model.getIndex(selectedMotorSet);
+			if (modelIndex < 0) {
+				// Motor not in the table model (e.g., custom motor loaded from an embedded .rse file).
+				return;
+			}
+			int index = table.convertRowIndexToView(modelIndex);
+			if (index < 0) {
+				return;
+			}
 			table.getSelectionModel().setSelectionInterval(index, index);
 			Rectangle rect = table.getCellRect(index, 0, true);
 			rect = new Rectangle(rect.x, rect.y - 100, rect.width, rect.height + 200);
