@@ -1538,22 +1538,26 @@ public class RocketActions {
 		@Override
 		public void clipboardChanged() {
 			var components = new ArrayList<>(selectionModel.getSelectedComponents());
-			super.setEnabled(!components.isEmpty());
+			// Only consider AxialStage components
+			List<RocketComponent> stages = components.stream()
+					.filter(AxialStage.class::isInstance)
+					.toList();
+			super.setEnabled(!stages.isEmpty());
 
-			if (components.isEmpty()) {
+			if (stages.isEmpty()) {
 				return;
 			}
 
 			FlightConfiguration config = rocket.getSelectedConfiguration();
 			// isStageActive() returns false for childless stages, so check getChildCount separately
-			boolean anyNoChildren = components.stream().anyMatch(s -> s.getChildCount() == 0);
-			boolean anyActive = components.stream().anyMatch(s -> config.isStageActive(s.getStageNumber()));
+			boolean anyNoChildren = stages.stream().anyMatch(s -> s.getChildCount() == 0);
+			boolean anyActive = stages.stream().anyMatch(s -> config.isStageActive(s.getStageNumber()));
 
 			if (anyNoChildren || anyActive) {
 				super.putValue(NAME, trans.get("RocketActions.StageActiveAct.DisableSelected"));
 				super.putValue(SMALL_ICON, Icons.COMPONENT_DISABLED);
 
-				String cannotDisableReason = getCannotDisableReason(components, config);
+				String cannotDisableReason = getCannotDisableReason(stages, config);
 				if (cannotDisableReason != null) {
 					super.setEnabled(false);
 					super.putValue(SHORT_DESCRIPTION, cannotDisableReason);
@@ -1577,10 +1581,16 @@ public class RocketActions {
 			}
 
 			FlightConfiguration config = rocket.getSelectedConfiguration();
-			boolean shouldActivate = components.stream().noneMatch(s -> config.isStageActive(s.getStageNumber()));
+			List<RocketComponent> stages = components.stream()
+					.filter(AxialStage.class::isInstance)
+					.toList();
+			if (stages.isEmpty()) {
+				return;
+			}
+			boolean shouldActivate = stages.stream().noneMatch(s -> config.isStageActive(s.getStageNumber()));
 			FlightConfigurationId configId = config.getFlightConfigurationID();
 
-			components.forEach(component -> {
+			stages.forEach(component -> {
 				if (component instanceof AxialStage stage) {
 					boolean isActive = config.isStageActive(stage.getStageNumber());
 					if (isActive != shouldActivate) {
