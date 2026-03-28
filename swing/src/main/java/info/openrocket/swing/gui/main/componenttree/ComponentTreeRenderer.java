@@ -63,6 +63,7 @@ public class ComponentTreeRenderer extends DefaultTreeCellRenderer {
 		layout.setHgap(4);
 		JPanel panel = new JPanel(layout);
 		JLabel label = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+		Font defaultFont = label.getFont().deriveFont(Font.PLAIN);
 		label.setIcon(null);
 		panel.add(label, BorderLayout.CENTER);
 
@@ -101,7 +102,7 @@ public class ComponentTreeRenderer extends DefaultTreeCellRenderer {
 		}
 
 		// Reset font to tree default (DefaultTreeCellRenderer reuses itself, so italic may persist)
-		label.setFont(tree.getFont());
+		label.setFont(defaultFont);
 
 		// Set the cell text color if component is hidden
 		if (!c.isVisible() && !sel) {
@@ -111,7 +112,7 @@ public class ComponentTreeRenderer extends DefaultTreeCellRenderer {
 		// Set italic + muted text for components in inactive stages
 		if (isInactiveStage && !sel) {
 			label.setForeground(visibilityHiddenForegroundColor);
-			label.setFont(tree.getFont().deriveFont(Font.ITALIC));
+			label.setFont(defaultFont.deriveFont(Font.ITALIC));
 		}
 
 		// Set the tree icon
