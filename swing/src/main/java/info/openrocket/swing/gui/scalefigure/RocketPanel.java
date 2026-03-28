@@ -2243,9 +2243,11 @@ public class RocketPanel extends JPanel implements TreeSelectionListener, Change
 		snapToggle.addActionListener(e -> caliperManager.setSnapEnabled(snapToggle.isSelected()));
 		panel.add(snapToggle, "cell 2 0");
 
-		// Units label + selector (label in row 0, selector in row 1)
-		panel.add(new JLabel(trans.get("RocketPanel.lbl.CaliperUnits")), "cell 0 1, split 2, spanx 2");
-		panel.add(caliperManager.getUnitSelector());
+		// Units + distance in one dedicated panel spanning cols 1–2 in row 1
+		JPanel unitsDistPanel = new JPanel(new MigLayout("ins 0", "[]4[]para[]", ""));
+		unitsDistPanel.setOpaque(false);
+		unitsDistPanel.add(new JLabel(trans.get("RocketPanel.lbl.CaliperUnits")));
+		unitsDistPanel.add(caliperManager.getUnitSelector());
 
 		// Distance display
 		JTextField distanceField = new JTextField("–", 6);
@@ -2291,7 +2293,8 @@ public class RocketPanel extends JPanel implements TreeSelectionListener, Change
 		distancePanel.add(distanceField);
 		distancePanel.add(rightArrow);
 		distancePanel.add(diamond2Btn);
-		panel.add(distancePanel, "cell 2 1");
+		unitsDistPanel.add(distancePanel);
+		panel.add(unitsDistPanel, "cell 0 1, spanx 3");
 
 		// Live distance update
 		final StateChangeListener[] listenerRef = new StateChangeListener[1];
