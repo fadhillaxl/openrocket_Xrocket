@@ -350,7 +350,6 @@ return console.askOkCancel(message, true);
                     </object>
                   </property>
                   <property name="keepConsoleWindow" type="boolean" value="true" />
-                  <property name="showWindowsConsole" type="boolean" value="true" />
                   <property name="wait" type="boolean" value="true" />
                   <property name="workingDirectory">
                     <object class="java.io.File">
