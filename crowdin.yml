@@ -12,8 +12,3 @@ files:
     type: properties
     escape_quotes: 3
     escape_special_characters: 0
-  - source: /core/src/main/resources/l10n/messages.properties
-    translation: /core/src/main/resources/l10n/messages_%locale_with_underscore%.properties
-    type: properties
-    escape_quotes: 3
-    escape_special_characters: 0
