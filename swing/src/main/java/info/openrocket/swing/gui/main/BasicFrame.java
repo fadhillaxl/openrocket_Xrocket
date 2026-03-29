@@ -519,7 +519,7 @@ private static final Translator trans = Application.getTranslator();
 
 		//// 	Save
 		item = new JMenuItem(trans.get("main.menu.file.save"), KeyEvent.VK_S);
-		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.META_DOWN_MASK));
+		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, GUIUtil.getMenuShortcutKeyMask()));
 		//// Save the current rocket design
 		item.getAccessibleContext().setAccessibleDescription(trans.get("main.menu.file.save.desc"));
 		item.setIcon(Icons.deriveMenuIcon(Icons.FILE_SAVE));
@@ -535,7 +535,7 @@ private static final Translator trans = Application.getTranslator();
 		//// 	Save as...
 		item = new JMenuItem(trans.get("main.menu.file.saveAs"), KeyEvent.VK_A);
 		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
-				InputEvent.SHIFT_DOWN_MASK | InputEvent.META_DOWN_MASK));
+				InputEvent.SHIFT_DOWN_MASK | GUIUtil.getMenuShortcutKeyMask()));
 		//// Save the current rocket design to a new file
 		item.getAccessibleContext().setAccessibleDescription(trans.get("main.menu.file.saveAs.desc"));
 		item.setIcon(Icons.deriveMenuIcon(Icons.FILE_SAVE_AS));
@@ -636,7 +636,7 @@ private static final Translator trans = Application.getTranslator();
 
 		//// 	Print design info...
 		item = new JMenuItem(trans.get("main.menu.file.print"), KeyEvent.VK_P);
-		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.META_DOWN_MASK));
+		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, GUIUtil.getMenuShortcutKeyMask()));
 		item.getAccessibleContext().setAccessibleDescription(trans.get("main.menu.file.print.desc"));
 		item.setIcon(Icons.deriveMenuIcon(Icons.FILE_PRINT));
 		item.addActionListener(new ActionListener() {
@@ -662,7 +662,7 @@ private static final Translator trans = Application.getTranslator();
 		item = new JMenuItem(trans.get("main.menu.file.properties"), KeyEvent.VK_I);
 		item.getAccessibleContext().setAccessibleDescription(trans.get("main.menu.file.properties.desc"));
 		item.setIcon(Icons.deriveMenuIcon(Icons.CONFIGURE));
-		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.META_DOWN_MASK));
+		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, GUIUtil.getMenuShortcutKeyMask()));
 		item.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -674,7 +674,7 @@ private static final Translator trans = Application.getTranslator();
 
 		////	Close
 		item = new JMenuItem(trans.get("main.menu.file.close"), KeyEvent.VK_C);
-		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.META_DOWN_MASK));
+		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, GUIUtil.getMenuShortcutKeyMask()));
 		//// Close the current rocket design
 		item.getAccessibleContext().setAccessibleDescription(trans.get("main.menu.file.close.desc"));
 		item.setIcon(Icons.deriveMenuIcon(Icons.FILE_CLOSE));
@@ -692,7 +692,7 @@ private static final Translator trans = Application.getTranslator();
 
 		////	Quit
 		item = new JMenuItem(trans.get("main.menu.file.quit"), KeyEvent.VK_Q);
-		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.META_DOWN_MASK));
+		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, GUIUtil.getMenuShortcutKeyMask()));
 		//// Quit the program
 		item.getAccessibleContext().setAccessibleDescription(trans.get("main.menu.file.quit.desc"));
 		item.setIcon(Icons.deriveMenuIcon(Icons.FILE_QUIT));
@@ -715,7 +715,7 @@ private static final Translator trans = Application.getTranslator();
 
 		Action action = UndoRedoAction.newUndoAction(document);
 		item = createMenuItemFromAction(action);
-		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.META_DOWN_MASK));
+		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, GUIUtil.getMenuShortcutKeyMask()));
 		item.setMnemonic(KeyEvent.VK_U);
 
 		////	Undo the previous operation
@@ -725,7 +725,7 @@ private static final Translator trans = Application.getTranslator();
 
 		action = UndoRedoAction.newRedoAction(document);
 		item = createMenuItemFromAction(action);
-		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.META_DOWN_MASK));
+		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, GUIUtil.getMenuShortcutKeyMask()));
 		item.setMnemonic(KeyEvent.VK_R);
 
 		////	Redo the previously undone operation
@@ -1102,7 +1102,7 @@ private static final Translator trans = Application.getTranslator();
 
 		//// New
 		item = new JMenuItem(trans.get("main.menu.file.new"), KeyEvent.VK_N);
-		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.META_DOWN_MASK));
+		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, GUIUtil.getMenuShortcutKeyMask()));
 		item.setMnemonic(KeyEvent.VK_N);
 		item.getAccessibleContext().setAccessibleDescription(trans.get("main.menu.file.new.desc"));
 		item.setIcon(Icons.deriveMenuIcon(Icons.FILE_NEW));
@@ -1120,7 +1120,7 @@ private static final Translator trans = Application.getTranslator();
 
 		//// 	Open...
 		item = new JMenuItem(trans.get("main.menu.file.open"), KeyEvent.VK_O);
-		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.META_DOWN_MASK));
+		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, GUIUtil.getMenuShortcutKeyMask()));
 		item.getAccessibleContext().setAccessibleDescription(trans.get("main.menu.file.open.desc"));
 		item.setIcon(Icons.deriveMenuIcon(Icons.FILE_OPEN));
 		item.addActionListener(new ActionListener() {
