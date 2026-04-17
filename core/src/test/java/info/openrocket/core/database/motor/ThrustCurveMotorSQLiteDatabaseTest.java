@@ -193,6 +193,41 @@ public class ThrustCurveMotorSQLiteDatabaseTest {
 	}
 
 	@Test
+	public void testDesignationDelayStrippedOnRead() throws Exception {
+		// A motor stored with designation "B6-0" (delay in designation, as some API sources provide)
+		// should be read back with designation "B6" so it groups with other B6 motors.
+		// The original is preserved in the code field.
+		ThrustCurveMotor motor = new ThrustCurveMotor.Builder()
+				.setManufacturer(Manufacturer.getManufacturer("Estes"))
+				.setCode("B6-0")
+				.setCommonName("B6")
+				.setDesignation("B6-0")
+				.setMotorType(Motor.Type.SINGLE)
+				.setStandardDelays(new double[] {})
+				.setDiameter(0.018)
+				.setLength(0.07)
+				.setTimePoints(new double[] { 0.0, 0.5, 1.0 })
+				.setThrustPoints(new double[] { 0.0, 6.0, 0.0 })
+				.setCGPoints(new CoordinateIF[] {
+						new Coordinate(0.035, 0, 0, 0.022),
+						new Coordinate(0.035, 0, 0, 0.020),
+						new Coordinate(0.035, 0, 0, 0.018)
+				})
+				.setInitialMass(0.022)
+				.build();
+
+		File dbFile = tempDir.resolve("b6-0.db").toFile();
+		ThrustCurveMotorSQLiteDatabase.writeDatabase(dbFile, List.of(motor));
+
+		List<ThrustCurveMotor> loaded = ThrustCurveMotorSQLiteDatabase.readDatabase(dbFile);
+		assertEquals(1, loaded.size());
+		ThrustCurveMotor m = loaded.get(0);
+		assertEquals("B6", m.getDesignation(), "Delay suffix should be stripped from designation");
+		assertEquals("B6-0", m.getCode(), "Original designation should be preserved in code");
+		assertEquals("B6", m.getCommonName());
+	}
+
+	@Test
 	public void testRoundTripPluggedDelay() throws Exception {
 		ThrustCurveMotor motor = new ThrustCurveMotor.Builder()
 				.setManufacturer(Manufacturer.getManufacturer("TestCo"))

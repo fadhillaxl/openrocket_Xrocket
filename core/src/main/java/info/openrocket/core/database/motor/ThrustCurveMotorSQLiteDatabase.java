@@ -1,5 +1,6 @@
 package info.openrocket.core.database.motor;
 
+import info.openrocket.core.file.motor.AbstractMotorLoader;
 import info.openrocket.core.motor.Manufacturer;
 import info.openrocket.core.motor.Motor;
 import info.openrocket.core.motor.MotorDigest;
@@ -571,10 +572,15 @@ public final class ThrustCurveMotorSQLiteDatabase {
 
 				String digest = computeDigest(timePoints, thrustPoints, cgPoints);
 
+				// Normalize designation: strip trailing delay suffix (e.g. "B6-0" -> "B6").
+				// This matches the behaviour of the RASP loader (removeDelayFromDesignation=true)
+				// and ensures motors from different sources are grouped into the same set.
+				String normalizedDesignation = AbstractMotorLoader.removeDelay(safeString(designation));
+
 				ThrustCurveMotor.Builder builder = new ThrustCurveMotor.Builder();
 				builder.setManufacturer(Manufacturer.getManufacturer(chooseManufacturerName(manufacturerName, manufacturerAbbrev)))
 						.setCode(safeString(designation))
-						.setDesignation(safeString(designation))
+						.setDesignation(normalizedDesignation)
 						.setCommonName(safeString(commonName))
 						.setDescription(description == null ? "" : description)
 						.setTcMotorId(tcMotorId == null ? "" : tcMotorId)
