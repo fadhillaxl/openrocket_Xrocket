@@ -117,7 +117,7 @@ public class ExampleFilesTest extends BaseTestCase {
 		EXPECTATIONS.put("Chute release.ork", ExpectedWarnings.builder()
 				.openWarnings(0, 0, 0)
 				.simulationWarnings("Simulation 2", 0, 0, 0)
-				.simulationWarnings("Simulation 3", 0, 1, 0)
+				.simulationWarnings("Simulation 3", 0, 0, 0)
 				.build());
 
 		EXPECTATIONS.put("Dual parachute deployment.ork", ExpectedWarnings.builder()
