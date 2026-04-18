@@ -296,19 +296,9 @@ public class ExampleFilesTest extends BaseTestCase {
 
 		EXPECTED_FLIGHT_CONFIGURATIONS.put("Pods--powered with recovery deployment.ork", ExpectedFlightConfigurations.builder()
 				.configuration(NO_MOTORS)
-				.configuration("[C6-7; 2\u00d7 A3-4, B6-0]",
-						"Booster Main Motor Tube -> B6-0 x1",
-						"Side Motor Tube -> A3-4 x1",
-						"Side Motor Tube -> A3-4 x1",
-						"Sustainer Motor Tube -> C6-7 x1")
-				.configuration("[C6-7; B6-0]",
-						"Booster Main Motor Tube -> B6-0 x1",
-						"Sustainer Motor Tube -> C6-7 x1")
-				.configuration("[C6-5; None]", "Sustainer Motor Tube -> C6-5 x1")
-				.configuration("[None; 2\u00d7 A10-3, B6-4]",
-						"Booster Main Motor Tube -> B6-4 x1",
-						"Side Motor Tube -> A10-3 x1",
-						"Side Motor Tube -> A10-3 x1")
+				.configuration("[2\u00d7 A10-3, A8-P]",
+						"Inner Tube -> A10-3 x2",
+						"Inner Tube -> A8-P x1")
 				.build());
 
 		EXPECTED_FLIGHT_CONFIGURATIONS.put("Simulation extensions.ork", ExpectedFlightConfigurations.builder()
