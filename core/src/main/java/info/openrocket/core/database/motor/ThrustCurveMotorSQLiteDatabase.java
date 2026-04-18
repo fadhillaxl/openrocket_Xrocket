@@ -454,14 +454,13 @@ public final class ThrustCurveMotorSQLiteDatabase {
 				"FROM motors m " +
 				"JOIN manufacturers mfr ON m.manufacturer_id = mfr.id";
 
-		// Get the preferred thrust curve for a motor (prefer cert > mfr > user)
+		// Get all thrust curves for a motor (prefer cert > mfr > user order)
 		String curveSql = "SELECT id FROM thrust_curves WHERE motor_id = ? " +
 				"ORDER BY CASE source " +
 				"  WHEN 'cert' THEN 1 " +
 				"  WHEN 'mfr' THEN 2 " +
 				"  WHEN 'user' THEN 3 " +
-				"  ELSE 4 END " +
-				"LIMIT 1";
+				"  ELSE 4 END";
 
 		String thrustSql = "SELECT time_seconds, force_newtons FROM thrust_data " +
 				"WHERE curve_id = ? ORDER BY time_seconds";
@@ -510,106 +509,99 @@ public final class ThrustCurveMotorSQLiteDatabase {
 					manufacturerAbbrev = motorRs.getString(21);
 				}
 
-				// Get the preferred thrust curve ID
-				Integer curveId = null;
+				// Collect all curve IDs for this motor
+				List<Integer> curveIds = new ArrayList<>();
 				curveStmt.setInt(1, motorId);
 				try (ResultSet curveRs = curveStmt.executeQuery()) {
-					if (curveRs.next()) {
-						curveId = curveRs.getInt(1);
+					while (curveRs.next()) {
+						curveIds.add(curveRs.getInt(1));
 					}
 				}
 
-				if (curveId == null) {
+				if (curveIds.isEmpty()) {
 					log.debug("Skipping motor with no thrust curves (designation={})", designation);
 					skippedNoCurve++;
 					continue;
 				}
 
-				// Read thrust data
-				List<Double> timeList = new ArrayList<>();
-				List<Double> thrustList = new ArrayList<>();
-				
-				thrustStmt.setInt(1, curveId);
-				try (ResultSet thrustRs = thrustStmt.executeQuery()) {
-					while (thrustRs.next()) {
-						timeList.add(thrustRs.getDouble(1));
-						thrustList.add(thrustRs.getDouble(2));
-					}
-				}
-
-				if (timeList.isEmpty()) {
-					log.debug("Skipping motor with no thrust data (designation={})", designation);
-					skippedNoData++;
-					continue;
-				}
-
-				double[] timePoints = timeList.stream().mapToDouble(Double::doubleValue).toArray();
-				double[] thrustPoints = thrustList.stream().mapToDouble(Double::doubleValue).toArray();
-
-				// Normalize thrust curve data
-				NormalizedThrustData normalized = normalizeThrustData(timePoints, thrustPoints, designation);
-				if (normalized == null) {
-					log.debug("Skipping motor with invalid thrust data (designation={})", designation);
-					skippedInvalid++;
-					continue;
-				}
-				timePoints = normalized.timePoints;
-				thrustPoints = normalized.thrustPoints;
+				// Normalize shared motor metadata once per motor row
+				String normalizedDesignation = AbstractMotorLoader.removeDelay(safeString(designation));
+				double[] delays = parseDelays(delaysStr);
+				Motor.Type motorType = parseMotorType(typeCode);
 
 				// Ensure we have valid length (required for CG calculation)
 				if (length <= 0) {
-					// Estimate length from diameter if available, otherwise use a default
-					length = diameter > 0 ? diameter * 3 : 0.1; // Default 100mm
+					length = diameter > 0 ? diameter * 3 : 0.1;
 				}
 
-				// Calculate CG points
-				CoordinateIF[] cgPoints = calculateCGPoints(timePoints, thrustPoints, totalWeight, propellantWeight, length);
+				// Create one ThrustCurveMotor per thrust curve
+				for (int curveId : curveIds) {
+					List<Double> timeList = new ArrayList<>();
+					List<Double> thrustList = new ArrayList<>();
 
-				// Parse delays
-				double[] delays = parseDelays(delaysStr);
+					thrustStmt.setInt(1, curveId);
+					try (ResultSet thrustRs = thrustStmt.executeQuery()) {
+						while (thrustRs.next()) {
+							timeList.add(thrustRs.getDouble(1));
+							thrustList.add(thrustRs.getDouble(2));
+						}
+					}
 
-				Motor.Type motorType = parseMotorType(typeCode);
+					if (timeList.isEmpty()) {
+						log.debug("Skipping curve {} with no thrust data (designation={})", curveId, designation);
+						skippedNoData++;
+						continue;
+					}
 
-				String digest = computeDigest(timePoints, thrustPoints, cgPoints);
+					double[] timePoints = timeList.stream().mapToDouble(Double::doubleValue).toArray();
+					double[] thrustPoints = thrustList.stream().mapToDouble(Double::doubleValue).toArray();
 
-				// Normalize designation: strip trailing delay suffix (e.g. "B6-0" -> "B6").
-				// This matches the behaviour of the RASP loader (removeDelayFromDesignation=true)
-				// and ensures motors from different sources are grouped into the same set.
-				String normalizedDesignation = AbstractMotorLoader.removeDelay(safeString(designation));
+					NormalizedThrustData normalized = normalizeThrustData(timePoints, thrustPoints, designation);
+					if (normalized == null) {
+						log.debug("Skipping curve {} with invalid thrust data (designation={})", curveId, designation);
+						skippedInvalid++;
+						continue;
+					}
+					timePoints = normalized.timePoints;
+					thrustPoints = normalized.thrustPoints;
 
-				ThrustCurveMotor.Builder builder = new ThrustCurveMotor.Builder();
-				builder.setManufacturer(Manufacturer.getManufacturer(chooseManufacturerName(manufacturerName, manufacturerAbbrev)))
-						.setCode(safeString(designation))
-						.setDesignation(normalizedDesignation)
-						.setCommonName(safeString(commonName))
-						.setDescription(description == null ? "" : description)
-						.setTcMotorId(tcMotorId == null ? "" : tcMotorId)
-						.setInfoUrl(infoUrl == null ? "" : infoUrl)
-						.setDataFiles(dataFiles)
-						.setUpdatedOn(updatedOn == null ? "" : updatedOn)
-						.setDataSource(dataSource == null ? "" : dataSource)
-						.setSparky(sparky)
-						.setMotorType(motorType)
-						.setDiameter(diameter)
-						.setLength(length)
-						.setCaseInfo(safeString(caseInfo))
-						.setPropellantInfo(safeString(propInfo))
-						.setInitialMass(totalWeight)
-						.setDigest(digest)
-						.setAvailability(true)
-						.setStandardDelays(delays)
-						.setTimePoints(timePoints)
-						.setThrustPoints(thrustPoints)
-						.setCGPoints(cgPoints);
+					CoordinateIF[] cgPoints = calculateCGPoints(timePoints, thrustPoints, totalWeight, propellantWeight, length);
+					String digest = computeDigest(timePoints, thrustPoints, cgPoints);
 
-				try {
-					motors.add(builder.build());
-				} catch (IllegalArgumentException e) {
-					log.warn("Skipping invalid motor (designation={}): {} [time[0]={}, length={}]", 
-							designation, e.getMessage(), 
-							timePoints.length > 0 ? timePoints[0] : "empty",
-							length);
-					skippedInvalid++;
+					ThrustCurveMotor.Builder builder = new ThrustCurveMotor.Builder();
+					builder.setManufacturer(Manufacturer.getManufacturer(chooseManufacturerName(manufacturerName, manufacturerAbbrev)))
+							.setCode(safeString(designation))
+							.setDesignation(normalizedDesignation)
+							.setCommonName(safeString(commonName))
+							.setDescription(description == null ? "" : description)
+							.setTcMotorId(tcMotorId == null ? "" : tcMotorId)
+							.setInfoUrl(infoUrl == null ? "" : infoUrl)
+							.setDataFiles(dataFiles)
+							.setUpdatedOn(updatedOn == null ? "" : updatedOn)
+							.setDataSource(dataSource == null ? "" : dataSource)
+							.setSparky(sparky)
+							.setMotorType(motorType)
+							.setDiameter(diameter)
+							.setLength(length)
+							.setCaseInfo(safeString(caseInfo))
+							.setPropellantInfo(safeString(propInfo))
+							.setInitialMass(totalWeight)
+							.setDigest(digest)
+							.setAvailability(true)
+							.setStandardDelays(delays)
+							.setTimePoints(timePoints)
+							.setThrustPoints(thrustPoints)
+							.setCGPoints(cgPoints);
+
+					try {
+						motors.add(builder.build());
+					} catch (IllegalArgumentException e) {
+						log.warn("Skipping invalid curve {} (designation={}): {} [time[0]={}, length={}]",
+								curveId, designation, e.getMessage(),
+								timePoints.length > 0 ? timePoints[0] : "empty",
+								length);
+						skippedInvalid++;
+					}
 				}
 			}
 		}
