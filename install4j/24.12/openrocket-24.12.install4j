@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="11.0.4" transformSequenceNumber="11">
   <directoryPresets config="${compiler:JAR_FILE_LOCATION}" />
-  <application name="OpenRocket" applicationId="8434-9327-1469-6373" mediaDir="media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}" shortName="OpenRocket" publisher="OpenRocket" publisherWeb="http://openrocket.info" version="24.12" allPathsRelative="true" convertDotsToUnderscores="false" macVolumeId="5f58a2be20d8e22f" javaMinVersion="17" javaMaxVersion="17" jdkMode="jdk" jdkName="JDK 17.0">
+  <application name="Xrocket" applicationId="8434-9327-1469-6373" mediaDir="media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}" shortName="Xrocket" publisher="Xrocket" publisherWeb="http://openrocket.info" version="24.12" allPathsRelative="true" convertDotsToUnderscores="false" macVolumeId="5f58a2be20d8e22f" javaMinVersion="17" javaMaxVersion="17" jdkMode="jdk" jdkName="JDK 17.0">
     <variables>
       <variable name="ISSUER_ID" value="8177d3a7-3edd-476c-b4fd-9d2bf8fbac50" hidden="true" />
       <variable name="KEY_ID" value="6CY43KJL23" hidden="true" />
@@ -33,11 +33,11 @@
     </entries>
   </files>
   <launchers>
-    <launcher name="OpenRocket 24.12" id="59" icnsFile="../../swing/build/resources/main/pix/icon/icon-macos.icns">
-      <executable name="OpenRocket" iconSet="true" iconFile="../../swing/build/resources/main/pix/icon/icon-windows.ico" executableDir="." executableMode="gui">
+    <launcher name="Xrocket 24.12" id="59" icnsFile="../../swing/src/main/resources/pix/icon/icon-macos.icns">
+      <executable name="Xrocket" iconSet="true" iconFile="../../swing/src/main/resources/pix/icon/icon-windows.ico" executableDir="." executableMode="gui">
         <versionInfo include="true" fileDescription="A model rocket flight-trajectory simulator." legalCopyright="Copyright 2007-2024 Sampo Niskanen and Others" internalName="${compiler:sys.shortName} ${compiler:sys.version}" />
       </executable>
-      <splashScreen show="true" width="662" height="336" bitmapFile="../../swing/build/resources/main/pix/splashscreen.png">
+      <splashScreen show="true" width="662" height="336" bitmapFile="../../swing/src/main/resources/pix/splashscreen.png">
         <text>
           <statusLine x="491" y="200" fontColor="255,255,255" />
           <versionLine x="489" y="143" text="version ${compiler:sys.version}" fontSize="10" fontColor="255,255,255" />
@@ -49,52 +49,52 @@
         </classPath>
       </java>
       <iconImageFiles>
-        <file path="../../swing/build/resources/main/pix/icon/icon-016.png" />
-        <file path="../../swing/build/resources/main/pix/icon/icon-032.png" />
-        <file path="../../swing/build/resources/main/pix/icon/icon-048.png" />
-        <file path="../../swing/build/resources/main/pix/icon/icon-064.png" />
-        <file path="../../swing/build/resources/main/pix/icon/icon-128.png" />
-        <file path="../../swing/build/resources/main/pix/icon/icon-256.png" />
+        <file path="../../swing/src/main/resources/pix/icon/icon-016.png" />
+        <file path="../../swing/src/main/resources/pix/icon/icon-032.png" />
+        <file path="../../swing/src/main/resources/pix/icon/icon-048.png" />
+        <file path="../../swing/src/main/resources/pix/icon/icon-064.png" />
+        <file path="../../swing/src/main/resources/pix/icon/icon-128.png" />
+        <file path="../../swing/src/main/resources/pix/icon/icon-256.png" />
       </iconImageFiles>
       <macStaticAssociations>
-        <fileAssociation extension="ork" description="OpenRocket Design" iconFile="../../swing/build/resources/main/pix/icon/icon-macos.icns" role="editor" />
+        <fileAssociation extension="ork" description="Xrocket Design" iconFile="../../swing/src/main/resources/pix/icon/icon-macos.icns" role="editor" />
       </macStaticAssociations>
     </launcher>
   </launchers>
   <installerGui>
     <laf type="native" />
     <applications>
-      <application id="installer" beanClass="com.install4j.runtime.beans.applications.InstallerApplication" customIcnsFile="../../swing/build/resources/main/pix/icon/icon-macos.icns" customIcoFile="../../swing/build/resources/main/pix/icon/icon-windows.ico">
+      <application id="installer" beanClass="com.install4j.runtime.beans.applications.InstallerApplication" customIcnsFile="../../swing/src/main/resources/pix/icon/icon-macos.icns" customIcoFile="../../swing/src/main/resources/pix/icon/icon-windows.ico">
         <serializedBean>
           <property name="customIconImageFiles">
             <add>
               <object class="com.install4j.api.beans.ExternalFile">
-                <string>../../swing/build/resources/main/pix/icon/icon-016.png</string>
+                <string>../../swing/src/main/resources/pix/icon/icon-016.png</string>
               </object>
             </add>
             <add>
               <object class="com.install4j.api.beans.ExternalFile">
-                <string>../../swing/build/resources/main/pix/icon/icon-032.png</string>
+                <string>../../swing/src/main/resources/pix/icon/icon-032.png</string>
               </object>
             </add>
             <add>
               <object class="com.install4j.api.beans.ExternalFile">
-                <string>../../swing/build/resources/main/pix/icon/icon-048.png</string>
+                <string>../../swing/src/main/resources/pix/icon/icon-048.png</string>
               </object>
             </add>
             <add>
               <object class="com.install4j.api.beans.ExternalFile">
-                <string>../../swing/build/resources/main/pix/icon/icon-064.png</string>
+                <string>../../swing/src/main/resources/pix/icon/icon-064.png</string>
               </object>
             </add>
             <add>
               <object class="com.install4j.api.beans.ExternalFile">
-                <string>../../swing/build/resources/main/pix/icon/icon-128.png</string>
+                <string>../../swing/src/main/resources/pix/icon/icon-128.png</string>
               </object>
             </add>
             <add>
               <object class="com.install4j.api.beans.ExternalFile">
-                <string>../../swing/build/resources/main/pix/icon/icon-256.png</string>
+                <string>../../swing/src/main/resources/pix/icon/icon-256.png</string>
               </object>
             </add>
           </property>
@@ -231,10 +231,10 @@ return console.askOkCancel(message, true);
               </action>
               <action id="230" beanClass="com.install4j.runtime.beans.actions.desktop.CreateStartMenuEntryAction" actionElevationType="elevated" rollbackBarrierExitCode="0" failureStrategy="ask" failureAskRetry="false">
                 <serializedBean>
-                  <property name="entryName" type="string">OpenRocket</property>
+                  <property name="entryName" type="string">Xrocket</property>
                   <property name="file">
                     <object class="java.io.File">
-                      <string>OpenRocket</string>
+                      <string>Xrocket</string>
                     </object>
                   </property>
                   <property name="icon">
@@ -254,7 +254,7 @@ return console.askOkCancel(message, true);
                 <serializedBean>
                   <property name="executable">
                     <object class="java.io.File">
-                      <string>OpenRocket</string>
+                      <string>Xrocket</string>
                     </object>
                   </property>
                 </serializedBean>
@@ -262,10 +262,10 @@ return console.askOkCancel(message, true);
               </action>
               <action id="229" beanClass="com.install4j.runtime.beans.actions.desktop.CreateDesktopLinkAction" actionElevationType="elevated" rollbackBarrierExitCode="0" failureStrategy="ask" failureAskRetry="false">
                 <serializedBean>
-                  <property name="description" type="string">OpenRocket Model Rocket Simulator</property>
+                  <property name="description" type="string">Xrocket Model Rocket Simulator</property>
                   <property name="file">
                     <object class="java.io.File">
-                      <string>OpenRocket</string>
+                      <string>Xrocket</string>
                     </object>
                   </property>
                   <property name="name" type="string">${compiler:sys.fullName}</property>
@@ -284,7 +284,7 @@ return console.askOkCancel(message, true);
               </action>
               <action id="233" beanClass="com.install4j.runtime.beans.actions.desktop.CreateFileAssociationAction" actionElevationType="elevated" rollbackBarrierExitCode="0" failureStrategy="ask" failureAskRetry="false">
                 <serializedBean>
-                  <property name="description" type="string">OpenRocket Design</property>
+                  <property name="description" type="string">Xrocket Design</property>
                   <property name="extension" type="string">ork</property>
                   <property name="launcherId" type="string">59</property>
                   <property name="unix" type="boolean" value="true" />
