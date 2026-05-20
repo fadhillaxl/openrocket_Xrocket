@@ -1,11 +1,11 @@
-name: openrocket
+name: Xrocket
 base: core22
 grade: stable
 confinement: strict
-adopt-info: openrocket
+adopt-info: Xrocket
 summary: A free, fully featured model rocket simulator.
 description: |
-  OpenRocket is a free, fully featured model rocket simulator...
+  Xrocket is a free, fully featured model rocket simulator...
 
 architectures:
   - build-on: [amd64]
@@ -16,7 +16,7 @@ architectures:
   #- build-on: [riscv64]
 
 apps:
-  openrocket:
+  Xrocket:
     command: bin/launcher
     plugs:
       - home
@@ -32,7 +32,7 @@ apps:
       JAVA_HOME: "$SNAP/usr/lib/jvm/java-17-openjdk-$SNAP_ARCH"
 
 parts:
-  openrocket:
+  Xrocket:  
     plugin: nil
     source: .
     build-packages:
@@ -90,7 +90,8 @@ parts:
 
       # Pick jar
       JAR="$(ls -1 build/libs/OpenRocket-*.jar | head -n1)"
-      install -Dm644 "$JAR" "$CRAFT_PART_INSTALL/OpenRocket.jar"
+      install -Dm644 "$JAR" "$CRAFT_PART_INSTALL/Xrocket.jar"
+
 
       # Set the version
       BV="$(grep -E '^build\.version=' core/src/main/resources/build.properties | cut -d= -f2)"

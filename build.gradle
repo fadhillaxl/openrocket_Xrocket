@@ -130,7 +130,7 @@ tasks.named('check') {
 
 // JAR config
 jar {
-    archiveBaseName = 'OpenRocket'
+    archiveBaseName = 'Xrocket'
 
     manifest {
         attributes(baseManifestAttributes)
@@ -145,7 +145,7 @@ dependencies {
 
 tasks.named('shadowJar', ShadowJar) {
     dependsOn(':core:processResources')
-    archiveBaseName = 'OpenRocket'
+    archiveBaseName = 'Xrocket'
     archiveVersion = '' + version
     archiveClassifier = ''
     dependsOn(distTar, distZip)
