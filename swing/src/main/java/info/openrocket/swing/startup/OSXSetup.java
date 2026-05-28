@@ -33,7 +33,7 @@ final class OSXSetup {
 	private static final Logger log = LoggerFactory.getLogger(OSXSetup.class);
 
 	// The name in the app menu
-	private static final String APP_NAME = "OpenRocket";
+	private static final String APP_NAME = "XRocket";
 	
 	// The image resource to use for the Dock Icon
 	private static final String ICON_RSRC = "/pix/icon/icon-256.png";
@@ -128,6 +128,8 @@ final class OSXSetup {
 
 		// Put the menu bar at the top of the screen
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
+		// Set application name for macOS menu bar
+		System.setProperty("apple.awt.application.name", APP_NAME);
 		// Fix window title bar color
 		System.setProperty("apple.awt.application.appearance", "system");
 		// Set the name in the menu

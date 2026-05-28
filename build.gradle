@@ -38,6 +38,10 @@ application {
     ]*/
 }
 
+tasks.named('run') {
+    jvmArgs = ['-Dapple.awt.application.name=XRocket']
+}
+
 // Fetch the build version from the build.properties file
 def buildProperties = new Properties()
 file('core/src/main/resources/build.properties').withInputStream { buildProperties.load(it) }
@@ -154,7 +158,7 @@ tasks.named('shadowJar', ShadowJar) {
         attributes(baseManifestAttributes)
         attributes(
                 'Add-Exports': 'java.base/java.lang=ALL-UNNAMED java.desktop/sun.awt=ALL-UNNAMED java.desktop/sun.java2d=ALL-UNNAMED',
-                'JVM-Args': '-Dapple.awt.application.appearance=system -Dsun.java2d.noddraw=true -Dsun.java2d.d3d=false -Dsun.java2d.ddforcevram=true -Dsun.java2d.ddblit=false -Dswing.useflipBufferStrategy=True'
+                'JVM-Args': '-Dapple.awt.application.name=XRocket -Dapple.awt.application.appearance=system -Dsun.java2d.noddraw=true -Dsun.java2d.d3d=false -Dsun.java2d.ddforcevram=true -Dsun.java2d.ddblit=false -Dswing.useflipBufferStrategy=True'
         )
     }
 }

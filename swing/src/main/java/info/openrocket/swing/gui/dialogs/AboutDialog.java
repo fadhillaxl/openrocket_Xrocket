@@ -30,7 +30,7 @@ public class AboutDialog extends JDialog {
 	private final Translator trans = Application.getTranslator();
 	
 	private final String CREDITS = "<html><center>" +
-		"<font size=\"+1\"><b>OpenRocket has been developed by:</b></font><br>" +
+		"<font size=\"+1\"><b>XRocket has been developed by:</b></font><br>" +
 		"<br>" +
 		"Sampo Niskanen (main developer)<br>" +
 		"Doug Pedrick (RockSim file format, printing)<br>" +
